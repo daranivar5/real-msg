@@ -1,4 +1,3 @@
-// src/index.js
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
@@ -11,21 +10,23 @@ dotenv.config();
 
 const app = express();
 
-// Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// so req.body works
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API routes
+
 app.use("/api/auth", authRoutes);
 
-// Serve frontend static files
+
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
+
 app.get("*", (req, res) => {
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(404).json({ message: "API route not found" });
+  }
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
 });
 
